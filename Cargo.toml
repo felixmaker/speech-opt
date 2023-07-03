@@ -1,0 +1,13 @@
+[package]
+name = "speech-opt"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.71"
+arboard = "3.2.0"
+fl2rust-macro = "0.5.15"
+fltk = { git = "https://ghproxy.com/github.com/fltk-rs/fltk-rs" }
+num_enum = "0.6.1"
+regex = "1.8.4"
+srtlib = "0.1.6"
