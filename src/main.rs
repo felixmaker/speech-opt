@@ -1,6 +1,8 @@
 use std::{path::PathBuf, time::Duration};
 
 use fltk::{prelude::*, *};
+use fltk_table::*;
+use srtlib::{Subtitle, Timestamp};
 
 mod ui {
     pub mod mainform {
@@ -13,10 +15,6 @@ mod ui {
 }
 
 mod ffopt;
-mod smart_table;
-
-use smart_table::*;
-use srtlib::{Subtitle, Timestamp};
 
 #[derive(Clone)]
 enum Message {
@@ -117,7 +115,8 @@ fn main() {
                 }
 
                 Message::LoadSubtitle => {
-                    let filename = dialog::file_chooser("Choose Subtitle File", "*.srt", ".", false);
+                    let filename =
+                        dialog::file_chooser("Choose Subtitle File", "*.srt", ".", false);
                     if filename.is_none() {
                         continue;
                     }
@@ -156,8 +155,7 @@ fn main() {
                         }
                     }
                     let result = result.join("\n");
-                    let mut clipboard = arboard::Clipboard::new().unwrap();
-                    clipboard.set_text(result).unwrap();
+                    app::copy(&result);
                 }
 
                 Message::ShowConbineDialog => {
@@ -183,11 +181,9 @@ fn main() {
                             window.hide();
                         }
                     });
-
                 }
 
                 Message::StartCombine(combine_start, combine_duration) => {
-                    
                     // Main work here
                     let audio = ui.input_file.value();
                     let audio = PathBuf::from(audio);
@@ -254,13 +250,17 @@ fn main() {
                         let mut end_time = Timestamp::new(0, 0, 0, 0);
                         end_time.add_milliseconds((start + duration).as_millis() as i32);
 
-                        
-                        subs.push(Subtitle { num: i, start_time, end_time, text: text.to_owned() })
+                        subs.push(Subtitle {
+                            num: i,
+                            start_time,
+                            end_time,
+                            text: text.to_owned(),
+                        })
                     }
 
-                    ffopt::join_audios(audio_joininfo.as_slice(), &PathBuf::from("./result.mp3")).unwrap();
+                    ffopt::join_audios(audio_joininfo.as_slice(), &PathBuf::from("./result.mp3"))
+                        .unwrap();
                     subs.write_to_file("./result.srt", None).unwrap();
-                    
                 }
 
                 Message::SetTableRowLength => {
