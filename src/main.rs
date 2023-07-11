@@ -68,6 +68,31 @@ fn set_table_opt(table: &mut SmartTable, rows: i32, text_col_width: i32) {
 fn main() {
     let app = app::App::default();
     let (sender, receiver) = fltk::app::channel();
+
+    // combine dialog
+    let mut dialog = ui::combine_dialog::UserInterface::make_window();
+
+    dialog.btn_cancel.set_callback({
+        let mut window = dialog.window.clone();
+        move |_| window.hide()
+    });
+
+    dialog.btn_confirm.set_callback({
+        let mut window = dialog.window.clone();
+        let choice_start = dialog.choice_start.clone();
+        let choice_duration = dialog.choice_duration.clone();
+        let sender = sender.clone();
+        move |_| {
+            let choice_start = choice_start.value();
+            let choice_duration = choice_duration.value();
+            sender.send(Message::StartCombine(
+                choice_start.into(),
+                choice_duration.into(),
+            ));
+            window.hide();
+        }
+    });
+    
     let mut ui = ui::mainform::UserInterface::make_window();
 
     // Load smart table
@@ -76,7 +101,6 @@ fn main() {
 
     set_table_opt(&mut table, 1, 110);
     ui.table_parent.end();
-    ui.window.end();
 
     ui.btn_load_audio.emit(sender.clone(), Message::LoadAudio);
     ui.btn_load_subtitle
@@ -159,28 +183,7 @@ fn main() {
                 }
 
                 Message::ShowConbineDialog => {
-                    let mut dialog = ui::combine_dialog::UserInterface::make_window();
-
-                    dialog.btn_cancel.set_callback({
-                        let mut window = dialog.window.clone();
-                        move |_| window.hide()
-                    });
-
-                    dialog.btn_confirm.set_callback({
-                        let mut window = dialog.window.clone();
-                        let choice_start = dialog.choice_start.clone();
-                        let choice_duration = dialog.choice_duration.clone();
-                        let sender = sender.clone();
-                        move |_| {
-                            let choice_start = choice_start.value();
-                            let choice_duration = choice_duration.value();
-                            sender.send(Message::StartCombine(
-                                choice_start.into(),
-                                choice_duration.into(),
-                            ));
-                            window.hide();
-                        }
-                    });
+                    dialog.window.show();
                 }
 
                 Message::StartCombine(combine_start, combine_duration) => {
