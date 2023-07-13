@@ -45,6 +45,11 @@ impl From<i32> for ItemType {
 }
 
 fn set_table_opt(table: &mut SmartTable, rows: i32, text_col_width: i32) {
+
+    if let Some(input) = table.input() {
+        input.hide();
+    }
+
     table.set_opts(TableOpts {
         rows,
         cols: 3,
@@ -62,7 +67,8 @@ fn set_table_opt(table: &mut SmartTable, rows: i32, text_col_width: i32) {
     table.set_col_width(1, 110);
     table.set_col_width(2, text_col_width);
 
-    table.end();
+    table.redraw();
+
 }
 
 fn main() {
