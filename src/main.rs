@@ -45,7 +45,6 @@ impl From<i32> for ItemType {
 }
 
 fn set_table_opt(table: &mut SmartTable, rows: i32, text_col_width: i32) {
-
     if let Some(input) = table.input() {
         input.hide();
     }
@@ -68,7 +67,6 @@ fn set_table_opt(table: &mut SmartTable, rows: i32, text_col_width: i32) {
     table.set_col_width(2, text_col_width);
 
     table.redraw();
-
 }
 
 fn main() {
@@ -98,7 +96,7 @@ fn main() {
             window.hide();
         }
     });
-    
+
     let mut ui = ui::mainform::UserInterface::make_window();
 
     // Load smart table
@@ -273,11 +271,12 @@ fn main() {
                 }
 
                 Message::SetTableRowLength => {
-                    let rows = dialog::input_default("How much rows to add in table?", "1")
+                    if let Some(rows) = dialog::input_default("How much rows to add in table?", "1")
                         .map(|x| x.parse::<i32>().unwrap_or(1))
-                        .unwrap_or(1);
-                    let text_col_width = table.col_width(2);
-                    set_table_opt(&mut table, rows, text_col_width);
+                    {
+                        let text_col_width = table.col_width(2);
+                        set_table_opt(&mut table, rows, text_col_width);
+                    }
                 }
             }
         }
